@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,22 +22,25 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Accept SDK licenses
+        run: yes | sdkmanager --licenses
+
+      - name: Install Android SDK
+        run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
 
       - name: Extract project
-        run: |
-          unzip -q HomeExpenses_Android_Project.zip -d buildsrc
+        run: unzip -q HomeExpenses_Android_Project.zip -d buildsrc
 
       - name: Build APK
-        run: |
-          cd buildsrc/HomeExpenses
-          gradle assembleDebug
+        run: cd buildsrc && gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: HomeExpenses-APK
-          path: buildsrc/HomeExpenses/app/build/outputs/apk/debug/app-debug.apk
+          path: buildsrc/app/build/outputs/apk/debug/app-debug.apk
