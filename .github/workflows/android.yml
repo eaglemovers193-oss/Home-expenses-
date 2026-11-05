@@ -1,4 +1,3 @@
-
 name: Build Home Expenses APK
 
 on:
@@ -12,65 +11,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Java
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Accept Android SDK licenses and install SDK
-        run: |
-          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0"
-
-      - name: Set up Gradle
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
 
-      - name: Extract Android project
-        run: unzip -q HomeExpenses_Android_Project.zip -d buildsrc
+      - name: Build APK
+        run: gradle assembleDebug
 
-      - name: Find project folder
-        run: |
-          SETTINGS_FILE=$(find buildsrc -name settings.gradle -type f -print -quit)
-          if [ -z "$SETTINGS_FILE" ]; then
-            echo "ERROR: settings.gradle not found"
-            exit 1
-          fi
-          PROJECT_DIR=$(dirname "$SETTINGS_FILE")
-          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-
-      - name: Build Android APK
-        run: gradle -p "$PROJECT_DIR" assembleDebug
-
-      - name: Find and verify APK
-        run: |
-          APK_PATH=$(find "$PROJECT_DIR" -type f \
-            -path "*/build/outputs/apk/debug/*.apk" \
-            -print -quit)
-
-          if [ -z "$APK_PATH" ]; then
-            echo "ERROR: APK not found"
-            exit 1
-          fi
-
-          echo "APK found:"
-          ls -lh "$APK_PATH"
-          unzip -t "$APK_PATH"
-
-          mkdir -p release
-          cp "$APK_PATH" release/HomeExpenses.apk
-
-      - name: Upload final APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: HomeExpenses-APK
-          path: release/HomeExpenses.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
