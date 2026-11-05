@@ -32,13 +32,21 @@ jobs:
       - name: Extract project
         run: unzip -q HomeExpenses_Android_Project.zip -d buildsrc
 
-      - name: Build APK
+      - name: Find project folder
         run: |
-          cd buildsrc
-          gradle assembleDebug
+          PROJECT_DIR=$(dirname "$(find buildsrc -name settings.gradle -type f -print -quit)")
+          if [ "$PROJECT_DIR" = "." ] || [ ! -f "$PROJECT_DIR/settings.gradle" ]; then
+            echo "ERROR: settings.gradle not found in extracted ZIP"
+            find buildsrc -maxdepth 4 -type f | head -50
+            exit 1
+          fi
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
+      - name: Build APK
+        run: gradle -p "$PROJECT_DIR" assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: HomeExpenses-APK
-          path: buildsrc/app/build/outputs/apk/debug/app-debug.apk
+          path: buildsrc/**/app/build/outputs/apk/debug/app-debug.apk
