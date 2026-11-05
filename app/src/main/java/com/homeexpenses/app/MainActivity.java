@@ -189,15 +189,36 @@ header.addView(homePicture, imageParams);
         nav.setGravity(Gravity.CENTER);
         nav.setBackground(shape(Color.WHITE,18));
 
-        String[] tabs = {"⌂ Home","▥ Reports","◷ History","ⓘ About"};
-        for (int i=0;i<tabs.length;i++) {
-            final int index=i;
-            TextView tab = text(tabs[i],12,blue,true);
-            tab.setGravity(Gravity.CENTER);
-            tab.setPadding(dp(5),dp(15),dp(5),dp(15));
-            nav.addView(tab,new LinearLayout.LayoutParams(0,-2,1));
-            tab.setOnClickListener(v -> openTab(index));
-        }
+        String[] tabs = {"Home","Reports","History","About"};
+
+int[] icons = {
+    R.drawable.ic_home,
+    R.drawable.ic_reports,
+    R.drawable.ic_history,
+    R.drawable.ic_about
+};
+
+for (int i=0; i<tabs.length; i++) {
+    final int index=i;
+
+    LinearLayout item = column();
+    item.setGravity(Gravity.CENTER);
+    item.setPadding(dp(4),dp(10),dp(4),dp(10));
+
+    ImageView icon = new ImageView(this);
+    icon.setImageResource(icons[i]);
+
+    LinearLayout.LayoutParams ip = params(24,24);
+    item.addView(icon,ip);
+
+    TextView label = text(tabs[i],11,blue,true);
+    item.addView(label);
+
+    nav.addView(item,
+        new LinearLayout.LayoutParams(0,-2,1));
+
+    item.setOnClickListener(v -> openTab(index));
+}
         main.addView(nav);
 
         refresh();
