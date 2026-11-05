@@ -118,6 +118,15 @@ public class MainActivity extends Activity {
         TextView tagline = text("Manage Your Home Budget Easily",14,ink,false);
         tagline.setGravity(Gravity.CENTER);
         header.addView(tagline);
+        ImageView homePicture = new ImageView(this);
+homePicture.setImageResource(R.drawable.ic_home_banner);
+homePicture.setScaleType(ImageView.ScaleType.FIT_CENTER);
+
+LinearLayout.LayoutParams imageParams =
+    new LinearLayout.LayoutParams(-1, dp(125));
+
+imageParams.topMargin = dp(10);
+header.addView(homePicture, imageParams);
         main.addView(header);
 
         gap(main,15);
