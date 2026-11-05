@@ -3,6 +3,7 @@
 
     <application
         android:allowBackup="true"
+        android:icon="@drawable/ic_home_expenses"
         android:label="Home Expenses"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:usesCleartextTraffic="false">
