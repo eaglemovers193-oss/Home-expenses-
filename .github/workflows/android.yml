@@ -35,26 +35,20 @@ jobs:
           gradle-version: '8.7'
 
       - name: Extract Android project
-        run: |
-          unzip -q HomeExpenses_Android_Project.zip -d buildsrc
+        run: unzip -q HomeExpenses_Android_Project.zip -d buildsrc
 
       - name: Find project folder
         run: |
           SETTINGS_FILE=$(find buildsrc -name settings.gradle -type f -print -quit)
-
           if [ -z "$SETTINGS_FILE" ]; then
             echo "ERROR: settings.gradle not found"
-            find buildsrc -maxdepth 5 -type f | head -100
             exit 1
           fi
-
           PROJECT_DIR=$(dirname "$SETTINGS_FILE")
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-          echo "Project found at: $PROJECT_DIR"
 
       - name: Build Android APK
-        run: |
-          gradle -p "$PROJECT_DIR" assembleDebug
+        run: gradle -p "$PROJECT_DIR" assembleDebug
 
       - name: Find and verify APK
         run: |
@@ -64,18 +58,12 @@ jobs:
 
           if [ -z "$APK_PATH" ]; then
             echo "ERROR: APK not found"
-            find "$PROJECT_DIR" -type f -name "*.apk"
             exit 1
           fi
 
-          APK_SIZE=$(stat -c%s "$APK_PATH")
-          echo "APK size: $APK_SIZE bytes"
+          echo "APK found:"
           ls -lh "$APK_PATH"
-
-          if [ "$APK_SIZE" -lt 100000 ]; then
-            echo "ERROR: APK file is too small"
-            exit 1
-          fi
+          unzip -t "$APK_PATH"
 
           mkdir -p release
           cp "$APK_PATH" release/HomeExpenses.apk
